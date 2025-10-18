@@ -5,6 +5,7 @@ import re
 from typing import Dict, Any
 from rich.console import Console
 from ..logger import log_info, log_debug, log_warning
+from ..command_config import DANGEROUS_PATTERNS, SAFE_COMMANDS, WRITE_INDICATORS
 
 
 class CommandExecutor:
@@ -23,34 +24,10 @@ class CommandExecutor:
         self.console = Console()
         log_info(f"CommandExecutor initialized - timeout={self.timeout}s, require_confirmation={self.require_confirmation}")
 
-        # Dangerous command patterns that should always be blocked or require confirmation
-        self.dangerous_patterns = [
-            r'rm\s+-rf',
-            r'sudo\s+rm',
-            r'format',
-            r'del\s+/[sf]',
-            r'shutdown',
-            r'reboot',
-            r'mkfs',
-            r'fdisk',
-            r'dd\s+if=',
-            r'>\s*/dev/',
-            r'chmod\s+777',
-            r'chown\s+-R',
-            r'killall',
-            r'pkill.*-9',
-        ]
-
-        # Safe read-only commands that don't require confirmation
-        self.safe_commands = [
-            'ping', 'ps', 'ls', 'cat', 'grep', 'find', 'which', 'whereis',
-            'df', 'free', 'top', 'netstat', 'ss', 'lsof', 'route', 'ip',
-            'systemctl status', 'launchctl list', 'sc query', 'tasklist',
-            'ifconfig', 'ipconfig', 'traceroute', 'tracert', 'dig', 'nslookup',
-            'hostname', 'uname', 'uptime', 'whoami', 'pwd', 'date', 'echo',
-            'curl', 'wget', 'git status', 'git log', 'git diff', 'env',
-            'printenv', 'head', 'tail', 'wc', 'sort', 'uniq', 'diff',
-        ]
+        # Import safety patterns from config
+        self.dangerous_patterns = DANGEROUS_PATTERNS
+        self.safe_commands = SAFE_COMMANDS
+        self.write_indicators = WRITE_INDICATORS
 
     def execute(self, command: str, os_info: Dict) -> Dict[str, Any]:
         """
@@ -151,15 +128,8 @@ class CommandExecutor:
         Returns:
             True if appears read-only, False otherwise
         """
-        # Write indicators that suggest command modifies state
-        write_indicators = [
-            '>', '>>', 'rm', 'del', 'mv', 'cp', 'mkdir', 'touch',
-            'chmod', 'chown', 'kill', 'sudo', 'write', 'append',
-            'create', 'update', 'delete', 'install', 'remove'
-        ]
-
         command_lower = command.lower()
-        return not any(indicator in command_lower for indicator in write_indicators)
+        return not any(indicator in command_lower for indicator in self.write_indicators)
 
     def _run_command(self, command: str) -> Dict[str, Any]:
         """

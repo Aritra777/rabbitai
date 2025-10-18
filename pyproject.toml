@@ -31,7 +31,6 @@ dependencies = [
     "langchain-community>=0.0.20",
     "prompt_toolkit>=3.0.0",
     "rich>=10.0.0",
-    "pydantic>=2.0.0",
     "pyyaml>=6.0.0",
 ]
 
@@ -47,4 +46,4 @@ dev = [
 ]
 
 [tool.setuptools]
-packages = ["rabbitai", "rabbitai.llm", "rabbitai.tools", "rabbitai.context"]
+packages = ["rabbitai", "rabbitai.llm", "rabbitai.tools", "rabbitai.context", "rabbitai.command_config"]

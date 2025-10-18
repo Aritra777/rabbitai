@@ -60,3 +60,4 @@ test_setup.sh
 # Claude
 .claude_config.json
 .claude/
+CLAUDE.md

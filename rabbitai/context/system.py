@@ -4,6 +4,7 @@ import platform
 import os
 import subprocess
 from typing import Dict, List
+from ..command_config import COMMON_COMMANDS, LINUX_COMMANDS, MACOS_COMMANDS, WINDOWS_COMMANDS
 
 
 class SystemContext:
@@ -71,32 +72,16 @@ class SystemContext:
         os_info = self.get_os_info()
         os_type = os_info['system']  # Use original value
 
-        # Base commands available on most systems
-        common = ['echo', 'cat', 'ls', 'pwd', 'whoami', 'date']
+        # Start with common commands
+        common = list(COMMON_COMMANDS)
 
-        # OS-specific commands
-        if os_type in ['linux', 'darwin']:
-            common.extend([
-                'ping', 'ps', 'grep', 'find', 'which', 'whereis',
-                'df', 'du', 'top', 'netstat', 'curl', 'wget'
-            ])
-
-            if os_type == 'linux':
-                common.extend([
-                    'systemctl', 'journalctl', 'ip', 'ss', 'free',
-                    'lsof', 'uname', 'hostname', 'uptime'
-                ])
-            elif os_type == 'darwin':  # macOS
-                common.extend([
-                    'launchctl', 'route', 'lsof', 'ifconfig',
-                    'uname', 'hostname', 'uptime'
-                ])
-
+        # Add OS-specific commands
+        if os_type == 'linux':
+            common.extend(LINUX_COMMANDS)
+        elif os_type == 'darwin':  # macOS
+            common.extend(MACOS_COMMANDS)
         elif os_type == 'windows':
-            common = [
-                'ping', 'ipconfig', 'tasklist', 'netstat', 'sc',
-                'wmic', 'dir', 'type', 'echo', 'where', 'hostname'
-            ]
+            common.extend(WINDOWS_COMMANDS)
 
         # Filter to only commands that are actually available
         self._common_commands = self._filter_available_commands(common)

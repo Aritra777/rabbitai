@@ -7,7 +7,7 @@ from rich.console import Console
 from rich.panel import Panel
 from rich.markdown import Markdown
 
-from .config import Config
+from .config_manager import Config
 from .agent import ReactAgent
 from .context.system import SystemContext
 from .llm.gemini import GeminiLLM
