@@ -5,17 +5,20 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "rabbitai"
 version = "0.1.0"
-description = "AI-powered CLI troubleshooting assistant"
+description = "AI-powered CLI troubleshooting assistant using ReAct pattern with LLM backends (Gemini/Ollama)"
 readme = "README.md"
 requires-python = ">=3.9"
 license = {text = "MIT"}
 authors = [
-    {name = "RabbitAI Contributors"}
+    {name = "Aritra777", email = "aritrabiswas.dev@gmail.com"}
 ]
+keywords = ["cli", "troubleshooting", "ai", "llm", "react", "agent", "gemini", "ollama", "langchain"]
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Intended Audience :: Developers",
-    "Topic :: Software Development :: Tools",
+    "Intended Audience :: System Administrators",
+    "Topic :: Software Development",
+    "Topic :: System :: Systems Administration",
     "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.9",
@@ -23,6 +26,8 @@ classifiers = [
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
+    "Environment :: Console",
+    "Operating System :: OS Independent",
 ]
 
 dependencies = [
@@ -34,6 +39,11 @@ dependencies = [
     "rich>=14.2.0",
     "pyyaml>=6.0.3",
 ]
+
+[project.urls]
+Homepage = "https://github.com/Aritra777/rabbitai"
+Repository = "https://github.com/Aritra777/rabbitai"
+Documentation = "https://github.com/Aritra777/rabbitai#readme"
 
 [project.scripts]
 rabbit = "rabbitai.cli:main"
