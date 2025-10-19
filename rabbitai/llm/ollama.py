@@ -2,6 +2,8 @@
 
 from langchain_community.chat_models import ChatOllama
 from .base import BaseLLM
+import subprocess
+from typing import List
 
 
 class OllamaLLM(BaseLLM):
@@ -55,3 +57,39 @@ class OllamaLLM(BaseLLM):
     def get_model_name(self) -> str:
         """Get the Ollama model name"""
         return self.model_name
+    
+    @staticmethod
+    def get_available_models() -> List[str]:
+        """Fetch available Ollama models from local system"""
+        try:
+            result = subprocess.run(
+                ['ollama', 'list'],
+                capture_output=True,
+                text=True,
+                timeout=5
+            )
+
+            if result.returncode != 0:
+                return []
+
+            # Parse output to extract model names
+            # Format: NAME                    ID              SIZE      MODIFIED
+            models = []
+            lines = result.stdout.strip().split('\n')
+
+            # Skip header line
+            for line in lines[1:]:
+                if line.strip():
+                    # Extract first column (model name)
+                    parts = line.split()
+                    if parts:
+                        model_name = parts[0]
+                        # Remove :latest or other tags if present
+                        base_name = model_name
+                        if base_name not in models:
+                            models.append(base_name)
+
+            return models
+        except (subprocess.TimeoutExpired, FileNotFoundError, Exception):
+            # Ollama not installed or not running
+            return []

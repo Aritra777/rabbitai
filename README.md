@@ -127,51 +127,32 @@ ollama pull llama3
 
 **4. "rabbit command not found"**
 
-If the `rabbit` command isn't found after installation, you may need to add it to your PATH or create an alias:
+After installation, the `rabbit` command may not be in your PATH. Add the scripts directory to your PATH:
 
-**macOS/Linux (bash):**
+**macOS:**
 ```bash
-# Add alias to bash profile
-echo 'alias rabbit="python3 -m rabbitai.cli"' >> ~/.bashrc
+# Add to ~/.zshrc or ~/.bash_profile
+export PATH="$HOME/Library/Python/3.9/bin:$PATH" # Replace the python version as per your current version
+source ~/.zshrc
+```
+
+**Linux:**
+```bash
+# Add to ~/.bashrc or ~/.profile
+export PATH="$HOME/.local/bin:$PATH"
 source ~/.bashrc
 ```
 
-**macOS (zsh - default on macOS Catalina and later):**
-```bash
-# Add alias to zsh profile
-echo 'alias rabbit="python3 -m rabbitai.cli"' >> ~/.zshrc
-source ~/.zshrc
-```
-
-**Linux (zsh):**
-```bash
-# Add alias to zsh profile
-echo 'alias rabbit="python3 -m rabbitai.cli"' >> ~/.zshrc
-source ~/.zshrc
-```
-
-**Windows (PowerShell):**
+**Windows:**
 ```powershell
-# Add alias to PowerShell profile
-Add-Content $PROFILE "`nSet-Alias -Name rabbit -Value 'python -m rabbitai.cli'"
-# Reload profile
-. $PROFILE
+# Add to PowerShell profile or Environment Variables
+$env:PATH += ";$env:APPDATA\Python\Python39\Scripts" # Replace the python version as per your current version
 ```
 
-**Windows (Command Prompt):**
-```batch
-# Create a batch file in a directory that's in your PATH
-# For example: C:\Windows\rabbit.bat
-@echo off
-python -m rabbitai.cli %*
-```
-
-**Alternative: Run directly without alias**
+**Alternative: Run directly without PATH setup**
 ```bash
-# Works on all platforms
-python3 -m rabbitai.cli
-# or on Windows
-python -m rabbitai.cli
+python3 -m rabbitai.cli  # macOS/Linux
+python -m rabbitai.cli   # Windows
 ```
 
 ## License

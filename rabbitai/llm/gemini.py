@@ -19,7 +19,7 @@ class GeminiLLM(BaseLLM):
         self.llm = ChatGoogleGenerativeAI(
             model=model,
             google_api_key=api_key,
-            temperature=0.1,  # Low temperature for more deterministic responses
+            temperature=0.25,
             convert_system_message_to_human=True  # Gemini compatibility
         )
 
@@ -53,3 +53,18 @@ class GeminiLLM(BaseLLM):
     def get_model_name(self) -> str:
         """Get the Gemini model name"""
         return self.model_name
+    
+    @staticmethod
+    def get_available_models() -> list:
+        """
+        Get a list of available Gemini models.
+
+        Returns:
+            List of model names
+        """
+        return [
+            ("gemini-2.5-pro",     "Gemini 2.5 Pro – Our most advanced reasoning model"),
+            ("gemini-2.5-flash",   "Gemini 2.5 Flash – High performance price-/speed-balanced model"),
+            ("gemini-2.5-flash-lite", "Gemini 2.5 Flash-Lite – Most cost-efficient & fastest in the 2.5 family"),
+            ("gemini-2.0-flash-001",   "Gemini 2.0 Flash – Multimodal model with next-gen features"),
+        ]

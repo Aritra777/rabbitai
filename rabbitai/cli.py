@@ -8,7 +8,7 @@ from rich.panel import Panel
 from rich.markdown import Markdown
 
 from .config_manager import Config
-from .agent import ReactAgent
+from .agents.reactagent import ReactAgent
 from .context.system import SystemContext
 from .llm.gemini import GeminiLLM
 from .llm.ollama import OllamaLLM

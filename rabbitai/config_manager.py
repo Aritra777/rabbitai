@@ -3,6 +3,8 @@
 import yaml
 from pathlib import Path
 from typing import Dict, Any
+from .llm.ollama import OllamaLLM
+from .llm.gemini import GeminiLLM
 
 
 class Config:
@@ -60,23 +62,28 @@ class Config:
     def setup_interactive(self):
         """Interactive configuration setup"""
         from rich.console import Console
-        from rich.prompt import Prompt
+        from rich.prompt import Prompt, IntPrompt
+        from rich.table import Table
 
         console = Console()
         config = self.default_config.copy()
 
+        # Available Gemini models with descriptions
+        GEMINI_MODELS = GeminiLLM.get_available_models()
+
         console.print("\n[bold color(136)]RabbitAI Setup[/bold color(136)]\n")
 
-        # LLM Provider
-        console.print("[dim]Choose your LLM provider:[/dim]")
-        console.print("  [color(136)]gemini[/color(136)] - Google's Gemini (cloud, requires API key)")
-        console.print("  [color(136)]ollama[/color(136)] - Local models (free, requires Ollama installed)\n")
+        # LLM Provider Selection
+        console.print("[bold]Choose your LLM provider:[/bold]\n")
+        console.print("  [color(136)]1.[/color(136)] Gemini - Google's Gemini (cloud, requires API key)")
+        console.print("  [color(136)]2.[/color(136)] Ollama - Local models (free, requires Ollama installed)\n")
 
-        provider = Prompt.ask(
-            "LLM provider",
-            choices=["gemini", "ollama"],
-            default="gemini"
+        provider_choice = IntPrompt.ask(
+            "Select provider",
+            choices=["1", "2"],
+            default=1
         )
+        provider = "gemini" if provider_choice == 1 else "ollama"
         config['llm']['provider'] = provider
 
         if provider == "gemini":
@@ -84,18 +91,55 @@ class Config:
             api_key = Prompt.ask("Enter Gemini API key", password=True)
             config['llm']['api_key'] = api_key
 
-            model = Prompt.ask(
-                "Model name",
-                default="gemini-pro"
+            # Gemini model selection with table
+            console.print("\n[bold]Select a Gemini model:[/bold]\n")
+
+            table = Table(show_header=False, box=None, padding=(0, 2))
+            for idx, (model_id, description) in enumerate(GEMINI_MODELS, 1):
+                table.add_row(
+                    f"[color(136)]{idx}.[/color(136)]",
+                    f"[bold]{model_id}[/bold]",
+                    f"[dim]{description}[/dim]"
+                )
+            console.print(table)
+            console.print()
+
+            model_choice = IntPrompt.ask(
+                "Select model",
+                choices=[str(i) for i in range(1, len(GEMINI_MODELS) + 1)],
+                default=1
             )
-            config['llm']['model'] = model
+            config['llm']['model'] = GEMINI_MODELS[model_choice - 1][0]
 
         elif provider == "ollama":
-            console.print("\n[dim]Make sure Ollama is running: ollama serve[/dim]")
-            console.print("[dim]Popular models: llama3, codellama, mistral[/dim]")
+            console.print("\n[dim]Fetching available Ollama models...[/dim]")
+            ollama_models = OllamaLLM.get_available_models()
 
-            model = Prompt.ask("Enter Ollama model name", default="llama3")
-            config['llm']['model'] = model
+            if not ollama_models:
+                console.print("[yellow]⚠ Could not fetch Ollama models. Make sure Ollama is installed and running.[/yellow]")
+                console.print("[dim]Install models with: ollama pull <model>[/dim]")
+                console.print("[dim]Popular models: llama3.2, llama3.1, mistral, codellama, phi3[/dim]\n")
+
+                model = Prompt.ask("Enter Ollama model name", default="llama3.2")
+                config['llm']['model'] = model
+            else:
+                console.print(f"\n[bold]Found {len(ollama_models)} installed model(s):[/bold]\n")
+
+                table = Table(show_header=False, box=None, padding=(0, 2))
+                for idx, model_name in enumerate(ollama_models, 1):
+                    table.add_row(
+                        f"[color(136)]{idx}.[/color(136)]",
+                        f"[bold]{model_name}[/bold]"
+                    )
+                console.print(table)
+                console.print()
+
+                model_choice = IntPrompt.ask(
+                    "Select model",
+                    choices=[str(i) for i in range(1, len(ollama_models) + 1)],
+                    default=1
+                )
+                config['llm']['model'] = ollama_models[model_choice - 1]
 
         # Timeouts (optional configuration)
         console.print("\n[bold]Timeout Settings[/bold]")
